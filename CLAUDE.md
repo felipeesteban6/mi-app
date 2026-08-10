@@ -33,7 +33,9 @@ Servidor **Oracle Cloud — Always Free**, VM AMD `VM.Standard.E2.1.Micro`
 
 - **Ruta del proyecto:** `/var/www/miapp`
 - **Document root de Nginx:** `/var/www/miapp/public` (NUNCA la raíz del proyecto)
-- **IP pública:** `129.213.165.120` (acceso por HTTP; SSL pendiente, requiere dominio)
+- **Dominio:** `felipemaldonado.dpdns.org` (y `www.`) con HTTPS vía Certbot. El puerto 80 solo
+  redirige a HTTPS para ese dominio; cualquier otro host (incluida la IP pública directa
+  `129.213.165.120`) recibe 404 por diseño de la config de Nginx.
 - **Usuario del sistema:** `ubuntu` (dueño del código); Nginx/PHP-FPM corren como `www-data`
 - **Socket PHP-FPM:** `unix:/var/run/php/php8.3-fpm.sock`
 - **Servicios:** `nginx`, `php8.3-fpm`, `mariadb` (todos habilitados al arranque)
@@ -65,7 +67,6 @@ migraciones, re-cache de config/rutas/vistas, permisos y reload de PHP-FPM.
 
 ## Pendientes conocidos
 
-- **SSL/HTTPS:** falta; requiere un dominio apuntando a la IP para emitir certificado con Certbot.
 - **Reinicio de kernel:** hay un kernel actualizado pendiente de cargar (`sudo reboot` cuando se pueda).
 - **Colas:** aún sin Supervisor; si se añaden jobs, configurar un worker con Supervisor.
 - **Base de datos:** hoy es MariaDB. A futuro se evaluó migrar a Oracle Autonomous DB
