@@ -19,7 +19,7 @@ set -euo pipefail
 # --- Configuración -----------------------------------------------------------
 APP_DIR="/var/www/miapp"
 PHP_FPM="php8.3-fpm"
-BRANCH="main"                      # cambia a 'master' si tu rama principal se llama así
+BRANCH="master"
 # -----------------------------------------------------------------------------
 
 echo "==> Desplegando en ${APP_DIR} (rama ${BRANCH})"
