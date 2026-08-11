@@ -1,8 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Modal from '@/Components/Modal.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 const props = defineProps({
     users: Array,
@@ -25,6 +30,35 @@ function submit(userId) {
         preserveScroll: true,
     });
 }
+
+const showCreateModal = ref(false);
+
+const createForm = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+    roles: [],
+});
+
+function openCreateModal() {
+    createForm.reset();
+    createForm.clearErrors();
+    showCreateModal.value = true;
+}
+
+function closeCreateModal() {
+    showCreateModal.value = false;
+    createForm.reset();
+    createForm.clearErrors();
+}
+
+function submitCreate() {
+    createForm.post(route('admin.users.store'), {
+        preserveScroll: true,
+        onSuccess: () => closeCreateModal(),
+    });
+}
 </script>
 
 <template>
@@ -32,9 +66,12 @@ function submit(userId) {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Usuarios y roles
-            </h2>
+            <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    Usuarios y roles
+                </h2>
+                <PrimaryButton @click="openCreateModal">Crear usuario</PrimaryButton>
+            </div>
         </template>
 
         <div class="py-12">
@@ -97,5 +134,79 @@ function submit(userId) {
                 </div>
             </div>
         </div>
+
+        <Modal :show="showCreateModal" @close="closeCreateModal">
+            <form @submit.prevent="submitCreate" class="p-6">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Crear usuario</h2>
+
+                <div class="mt-6">
+                    <InputLabel for="create_name" value="Nombre" />
+                    <TextInput
+                        id="create_name"
+                        v-model="createForm.name"
+                        type="text"
+                        class="mt-1 block w-full"
+                        required
+                        autofocus
+                    />
+                    <InputError :message="createForm.errors.name" class="mt-2" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="create_email" value="Email" />
+                    <TextInput
+                        id="create_email"
+                        v-model="createForm.email"
+                        type="email"
+                        class="mt-1 block w-full"
+                        required
+                    />
+                    <InputError :message="createForm.errors.email" class="mt-2" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="create_password" value="Contraseña" />
+                    <TextInput
+                        id="create_password"
+                        v-model="createForm.password"
+                        type="password"
+                        class="mt-1 block w-full"
+                        required
+                    />
+                    <InputError :message="createForm.errors.password" class="mt-2" />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel for="create_password_confirmation" value="Confirmar contraseña" />
+                    <TextInput
+                        id="create_password_confirmation"
+                        v-model="createForm.password_confirmation"
+                        type="password"
+                        class="mt-1 block w-full"
+                        required
+                    />
+                </div>
+
+                <div class="mt-4">
+                    <InputLabel value="Roles" />
+                    <div class="mt-2 flex flex-wrap gap-3">
+                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-1 text-sm">
+                            <input
+                                type="checkbox"
+                                :value="role"
+                                v-model="createForm.roles"
+                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                            />
+                            <span>{{ role }}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <SecondaryButton @click="closeCreateModal">Cancelar</SecondaryButton>
+                    <PrimaryButton :disabled="createForm.processing">Crear</PrimaryButton>
+                </div>
+            </form>
+        </Modal>
     </AuthenticatedLayout>
 </template>

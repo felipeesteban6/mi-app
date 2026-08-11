@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [UserRoleController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserRoleController::class, 'store'])->name('users.store');
     Route::patch('/users/{user}/roles', [UserRoleController::class, 'update'])->name('users.roles.update');
 });
 
