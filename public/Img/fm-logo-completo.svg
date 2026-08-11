@@ -1,0 +1,36 @@
+<svg width="480" height="140" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Felipe Maldonado - Soluciones Informáticas">
+  <defs>
+    <linearGradient id="fmg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="0.55" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="fmgText" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Símbolo -->
+  <g transform="translate(6,18) scale(0.72)">
+    <path d="M22 70 L64 32 L106 70" fill="none" stroke="url(#fmg2)" stroke-width="15" stroke-linejoin="miter"/>
+    <path d="M22 98 L64 60 L106 98" fill="none" stroke="url(#fmg2)" stroke-width="15" stroke-linejoin="miter" opacity="0.45"/>
+    <rect x="57" y="25" width="14" height="14" rx="2" transform="rotate(45 64 32)" fill="#06B6D4"/>
+  </g>
+
+  <!-- Nombre -->
+  <text x="112" y="62"
+        font-family="'Century Gothic','Futura','Poppins','Segoe UI',sans-serif"
+        font-size="34" font-weight="700" fill="#1E293B"
+        letter-spacing="2">FELIPE</text>
+  <text x="112" y="98"
+        font-family="'Century Gothic','Futura','Poppins','Segoe UI',sans-serif"
+        font-size="34" font-weight="400" fill="url(#fmgText)"
+        letter-spacing="2">MALDONADO</text>
+
+  <!-- Bajada -->
+  <text x="114" y="120"
+        font-family="'Century Gothic','Futura','Poppins','Segoe UI',sans-serif"
+        font-size="11.5" font-weight="600" fill="#64748B"
+        letter-spacing="5.5">SOLUCIONES INFORMÁTICAS</text>
+</svg>

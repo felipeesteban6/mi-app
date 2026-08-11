@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FM símbolo">
+  <defs>
+    <linearGradient id="fmg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="0.55" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Chevrón superior (marca principal) -->
+  <path d="M22 70 L64 32 L106 70"
+        fill="none" stroke="url(#fmg)" stroke-width="15"
+        stroke-linejoin="miter" stroke-linecap="butt"/>
+
+  <!-- Chevrón inferior (eco, más ligero) -->
+  <path d="M22 98 L64 60 L106 98"
+        fill="none" stroke="url(#fmg)" stroke-width="15"
+        stroke-linejoin="miter" stroke-linecap="butt" opacity="0.45"/>
+
+  <!-- Nodo geométrico en el vértice -->
+  <rect x="57" y="25" width="14" height="14" rx="2" transform="rotate(45 64 32)" fill="#06B6D4"/>
+</svg>
