@@ -6,8 +6,9 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 const props = defineProps({
     users: Array,
@@ -16,21 +17,7 @@ const props = defineProps({
 
 const page = usePage();
 
-const selections = reactive(
-    Object.fromEntries(
-        props.users.map((user) => [user.id, user.roles.map((role) => role.name)])
-    )
-);
-
-const forms = reactive(Object.fromEntries(props.users.map((user) => [user.id, useForm({ roles: [] })])));
-
-function submit(userId) {
-    forms[userId].roles = selections[userId];
-    forms[userId].patch(route('admin.users.roles.update', userId), {
-        preserveScroll: true,
-    });
-}
-
+// Crear usuario
 const showCreateModal = ref(false);
 
 const createForm = useForm({
@@ -59,6 +46,45 @@ function submitCreate() {
         onSuccess: () => closeCreateModal(),
     });
 }
+
+// Editar roles
+const showEditModal = ref(false);
+const editingUser = ref(null);
+
+const editForm = useForm({
+    roles: [],
+});
+
+function openEditModal(user) {
+    editingUser.value = user;
+    editForm.reset();
+    editForm.clearErrors();
+    editForm.roles = user.roles.map((role) => role.name);
+    showEditModal.value = true;
+}
+
+function closeEditModal() {
+    showEditModal.value = false;
+    editingUser.value = null;
+    editForm.reset();
+    editForm.clearErrors();
+}
+
+function submitEdit() {
+    editForm.patch(route('admin.users.roles.update', editingUser.value.id), {
+        preserveScroll: true,
+        onSuccess: () => closeEditModal(),
+    });
+}
+
+// Eliminar usuario
+function destroyUser(user) {
+    if (!confirm(`¿Eliminar al usuario "${user.name}"? Esta acción no se puede deshacer.`)) {
+        return;
+    }
+
+    router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
+}
 </script>
 
 <template>
@@ -83,6 +109,13 @@ function submitCreate() {
                     {{ page.props.flash.success }}
                 </div>
 
+                <div
+                    v-if="page.props.flash?.error"
+                    class="mb-4 rounded-md bg-red-100 dark:bg-red-900 px-4 py-3 text-sm text-red-800 dark:text-red-200"
+                >
+                    {{ page.props.flash.error }}
+                </div>
+
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <table class="w-full text-left text-sm">
@@ -103,29 +136,24 @@ function submitCreate() {
                                     <td class="py-3 pr-4">{{ user.name }}</td>
                                     <td class="py-3 pr-4">{{ user.email }}</td>
                                     <td class="py-3 pr-4">
-                                        <div class="flex flex-wrap gap-3">
-                                            <label
-                                                v-for="role in roles"
-                                                :key="role"
-                                                class="inline-flex items-center gap-1"
+                                        <div class="flex flex-wrap gap-1">
+                                            <span
+                                                v-for="role in user.roles"
+                                                :key="role.id"
+                                                class="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:text-indigo-200"
                                             >
-                                                <input
-                                                    type="checkbox"
-                                                    :value="role"
-                                                    v-model="selections[user.id]"
-                                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                                />
-                                                <span>{{ role }}</span>
-                                            </label>
+                                                {{ role.name }}
+                                            </span>
+                                            <span v-if="!user.roles.length" class="text-xs text-gray-400">
+                                                Sin roles
+                                            </span>
                                         </div>
                                     </td>
                                     <td class="py-3 pr-4">
-                                        <PrimaryButton
-                                            :disabled="forms[user.id].processing"
-                                            @click="submit(user.id)"
-                                        >
-                                            Guardar
-                                        </PrimaryButton>
+                                        <div class="flex gap-2">
+                                            <SecondaryButton @click="openEditModal(user)">Editar</SecondaryButton>
+                                            <DangerButton @click="destroyUser(user)">Eliminar</DangerButton>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -135,6 +163,7 @@ function submitCreate() {
             </div>
         </div>
 
+        <!-- Modal: crear usuario -->
         <Modal :show="showCreateModal" @close="closeCreateModal">
             <form @submit.prevent="submitCreate" class="p-6">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Crear usuario</h2>
@@ -205,6 +234,37 @@ function submitCreate() {
                 <div class="mt-6 flex justify-end gap-3">
                     <SecondaryButton @click="closeCreateModal">Cancelar</SecondaryButton>
                     <PrimaryButton :disabled="createForm.processing">Crear</PrimaryButton>
+                </div>
+            </form>
+        </Modal>
+
+        <!-- Modal: editar roles de usuario -->
+        <Modal :show="showEditModal" @close="closeEditModal">
+            <form v-if="editingUser" @submit.prevent="submitEdit" class="p-6">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                    Editar usuario: {{ editingUser.name }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ editingUser.email }}</p>
+
+                <div class="mt-6">
+                    <InputLabel value="Roles" />
+                    <div class="mt-2 flex flex-wrap gap-3">
+                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-1 text-sm">
+                            <input
+                                type="checkbox"
+                                :value="role"
+                                v-model="editForm.roles"
+                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                            />
+                            <span>{{ role }}</span>
+                        </label>
+                    </div>
+                    <InputError :message="editForm.errors.roles" class="mt-2" />
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <SecondaryButton @click="closeEditModal">Cancelar</SecondaryButton>
+                    <PrimaryButton :disabled="editForm.processing">Guardar</PrimaryButton>
                 </div>
             </form>
         </Modal>

@@ -52,4 +52,15 @@ class UserRoleController extends Controller
 
         return back()->with('success', 'Roles actualizados correctamente.');
     }
+
+    public function destroy(Request $request, User $user)
+    {
+        if ($user->id === $request->user()->id) {
+            return back()->with('error', 'No puedes eliminar tu propio usuario.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'Usuario eliminado correctamente.');
+    }
 }

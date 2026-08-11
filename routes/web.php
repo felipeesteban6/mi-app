@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users', [UserRoleController::class, 'index'])->name('users.index');
     Route::post('/users', [UserRoleController::class, 'store'])->name('users.store');
     Route::patch('/users/{user}/roles', [UserRoleController::class, 'update'])->name('users.roles.update');
+    Route::delete('/users/{user}', [UserRoleController::class, 'destroy'])->name('users.destroy');
 });
 
 require __DIR__.'/auth.php';
