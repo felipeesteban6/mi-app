@@ -7,8 +7,10 @@ import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
+import Checkbox from '@/Components/Checkbox.vue';
+import { alertError, alertSuccess, confirmDelete } from '@/alert';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     users: Array,
@@ -16,6 +18,20 @@ const props = defineProps({
 });
 
 const page = usePage();
+
+watch(
+    () => page.props.flash?.success,
+    (message) => {
+        if (message) alertSuccess(message);
+    }
+);
+
+watch(
+    () => page.props.flash?.error,
+    (message) => {
+        if (message) alertError(message);
+    }
+);
 
 // Crear usuario
 const showCreateModal = ref(false);
@@ -78,10 +94,13 @@ function submitEdit() {
 }
 
 // Eliminar usuario
-function destroyUser(user) {
-    if (!confirm(`¿Eliminar al usuario "${user.name}"? Esta acción no se puede deshacer.`)) {
-        return;
-    }
+async function destroyUser(user) {
+    const confirmed = await confirmDelete({
+        title: `¿Eliminar a "${user.name}"?`,
+        text: 'Esta acción no se puede deshacer.',
+    });
+
+    if (!confirmed) return;
 
     router.delete(route('admin.users.destroy', user.id), { preserveScroll: true });
 }
@@ -102,20 +121,6 @@ function destroyUser(user) {
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div
-                    v-if="page.props.flash?.success"
-                    class="mb-4 rounded-md bg-green-100 dark:bg-green-900 px-4 py-3 text-sm text-green-800 dark:text-green-200"
-                >
-                    {{ page.props.flash.success }}
-                </div>
-
-                <div
-                    v-if="page.props.flash?.error"
-                    class="mb-4 rounded-md bg-red-100 dark:bg-red-900 px-4 py-3 text-sm text-red-800 dark:text-red-200"
-                >
-                    {{ page.props.flash.error }}
-                </div>
-
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <table class="w-full text-left text-sm">
@@ -219,13 +224,8 @@ function destroyUser(user) {
                 <div class="mt-4">
                     <InputLabel value="Roles" />
                     <div class="mt-2 flex flex-wrap gap-3">
-                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-1 text-sm">
-                            <input
-                                type="checkbox"
-                                :value="role"
-                                v-model="createForm.roles"
-                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                            />
+                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-2 text-sm">
+                            <Checkbox :value="role" v-model:checked="createForm.roles" />
                             <span>{{ role }}</span>
                         </label>
                     </div>
@@ -249,13 +249,8 @@ function destroyUser(user) {
                 <div class="mt-6">
                     <InputLabel value="Roles" />
                     <div class="mt-2 flex flex-wrap gap-3">
-                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-1 text-sm">
-                            <input
-                                type="checkbox"
-                                :value="role"
-                                v-model="editForm.roles"
-                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                            />
+                        <label v-for="role in roles" :key="role" class="inline-flex items-center gap-2 text-sm">
+                            <Checkbox :value="role" v-model:checked="editForm.roles" />
                             <span>{{ role }}</span>
                         </label>
                     </div>
