@@ -30,6 +30,15 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth', 'verified', 'role:admin|admin_syr'])
+    ->get('/syr', fn () => Inertia::render('Demos/SyR'))->name('syr');
+
+Route::middleware(['auth', 'verified', 'role:admin|admin_receta'])
+    ->get('/recetas', fn () => Inertia::render('Demos/Recetas'))->name('recetas');
+
+Route::middleware(['auth', 'verified', 'role:admin|admin_juegos'])
+    ->get('/juego', fn () => Inertia::render('Demos/Juego'))->name('juego');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

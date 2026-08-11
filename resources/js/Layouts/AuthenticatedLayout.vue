@@ -1,12 +1,18 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+
+const roles = computed(() => usePage().props.auth.roles ?? []);
+const isAdmin = computed(() => roles.value.includes('admin'));
+const canSeeSyr = computed(() => isAdmin.value || roles.value.includes('admin_syr'));
+const canSeeRecetas = computed(() => isAdmin.value || roles.value.includes('admin_receta'));
+const canSeeJuego = computed(() => isAdmin.value || roles.value.includes('admin_juegos'));
 </script>
 
 <template>
@@ -29,8 +35,21 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
+                                <NavLink v-if="canSeeSyr" :href="route('syr')" :active="route().current('syr')">
+                                    SyR
+                                </NavLink>
                                 <NavLink
-                                    v-if="$page.props.auth.roles?.includes('admin')"
+                                    v-if="canSeeRecetas"
+                                    :href="route('recetas')"
+                                    :active="route().current('recetas')"
+                                >
+                                    Recetas
+                                </NavLink>
+                                <NavLink v-if="canSeeJuego" :href="route('juego')" :active="route().current('juego')">
+                                    Juego
+                                </NavLink>
+                                <NavLink
+                                    v-if="isAdmin"
                                     :href="route('admin.users.index')"
                                     :active="route().current('admin.users.index')"
                                 >
@@ -118,6 +137,23 @@ const showingNavigationDropdown = ref(false);
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink v-if="canSeeSyr" :href="route('syr')" :active="route().current('syr')">
+                            SyR
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="canSeeRecetas"
+                            :href="route('recetas')"
+                            :active="route().current('recetas')"
+                        >
+                            Recetas
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="canSeeJuego"
+                            :href="route('juego')"
+                            :active="route().current('juego')"
+                        >
+                            Juego
                         </ResponsiveNavLink>
                     </div>
 

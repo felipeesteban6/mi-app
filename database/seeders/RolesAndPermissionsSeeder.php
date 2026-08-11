@@ -29,6 +29,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         Role::firstOrCreate(['name' => 'editor']);
         Role::firstOrCreate(['name' => 'user']);
+        Role::firstOrCreate(['name' => 'admin_syr']);
+        Role::firstOrCreate(['name' => 'admin_receta']);
+        Role::firstOrCreate(['name' => 'admin_juegos']);
 
         $adminUser = \App\Models\User::firstOrCreate(
             ['email' => 'admin@example.com'],
