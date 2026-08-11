@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 
-const isDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+const isDark = () => document.documentElement.classList.contains('dark');
 
 const themed = () =>
     Swal.mixin({
