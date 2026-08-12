@@ -46,3 +46,33 @@ export function confirmDelete({ title = '¿Estás seguro?', text = '', confirmBu
         })
         .then((result) => result.isConfirmed);
 }
+
+export function confirmAction({ title = '¿Confirmar?', text = '', confirmButtonText = 'Confirmar' } = {}) {
+    return themed()
+        .fire({
+            title,
+            text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText,
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+        })
+        .then((result) => result.isConfirmed);
+}
+
+export function promptText({ title, inputLabel = '', inputPlaceholder = '', confirmButtonText = 'Guardar' } = {}) {
+    return themed()
+        .fire({
+            title,
+            input: 'text',
+            inputLabel,
+            inputPlaceholder,
+            showCancelButton: true,
+            confirmButtonText,
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            inputValidator: (value) => (!value ? 'Este campo es obligatorio.' : undefined),
+        })
+        .then((result) => (result.isConfirmed ? result.value : null));
+}

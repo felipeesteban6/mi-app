@@ -7,7 +7,7 @@ import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
-import { alertSuccess, confirmDelete } from '@/alert';
+import { alertSuccess, confirmAction, confirmDelete } from '@/alert';
 import { useRecetasDemo } from '@/Composables/useRecetasDemo';
 import { Head } from '@inertiajs/vue3';
 import { computed, reactive, ref } from 'vue';
@@ -71,7 +71,7 @@ function submitCreate() {
 }
 
 async function avanzar(receta, siguienteLabel) {
-    const confirmed = await confirmDelete({
+    const confirmed = await confirmAction({
         title: `¿${siguienteLabel}?`,
         text: `Receta de ${receta.paciente} — ${receta.medicamento}`,
         confirmButtonText: 'Confirmar',
