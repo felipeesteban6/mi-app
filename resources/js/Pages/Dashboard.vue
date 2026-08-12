@@ -1,13 +1,15 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import StatTile from '@/Components/Charts/StatTile.vue';
+import StatusIcon from '@/Components/Charts/StatusIcon.vue';
 import LineChart from '@/Components/Charts/LineChart.vue';
 import BarChart from '@/Components/Charts/BarChart.vue';
 import { useInvernaderoDemo } from '@/Composables/useInvernaderoDemo';
-import { categorical } from '@/chartColors';
+import { categorical, status as statusColors } from '@/chartColors';
 import { useTheme } from '@/theme';
 import { pick } from '@/chartColors';
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const { horas, temperatura, humedadAmbiente, humedadSuelo, luzPorZona, resumen } = useInvernaderoDemo();
 const { isDark } = useTheme();
@@ -18,6 +20,23 @@ const humedadSeries = [
 ];
 
 const temperaturaSeries = [{ name: 'Temperatura', color: categorical[1], data: temperatura }];
+
+const metricasTitulo = {
+    temperatura: 'Temperatura',
+    humedadAmbiente: 'Humedad ambiente',
+    humedadSuelo: 'Humedad de suelo',
+    co2: 'CO₂',
+};
+
+const alertas = computed(() =>
+    Object.entries(resumen)
+        .filter(([, m]) => m.status !== 'good')
+        .map(([clave, m]) => ({
+            titulo: metricasTitulo[clave],
+            status: m.status,
+            mensaje: `${m.statusLabel}: ${m.valor}${m.unidad}`,
+        }))
+);
 </script>
 
 <template>
@@ -37,6 +56,28 @@ const temperaturaSeries = [{ name: 'Temperatura', color: categorical[1], data: t
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         Datos de muestra — vista de ejemplo de un sistema de sensores. Iremos mejorando este panel.
                     </p>
+                </div>
+
+                <!-- Alertas por umbral -->
+                <div
+                    v-if="alertas.length"
+                    class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg border-l-4 p-4"
+                    :style="{ borderLeftColor: statusColors[alertas[0].status] }"
+                >
+                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                        {{ alertas.length }} métrica(s) fuera de rango
+                    </p>
+                    <ul class="mt-2 space-y-1.5">
+                        <li
+                            v-for="alerta in alertas"
+                            :key="alerta.titulo"
+                            class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                        >
+                            <StatusIcon :status="alerta.status" />
+                            <span class="font-medium text-gray-800 dark:text-gray-200">{{ alerta.titulo }}:</span>
+                            {{ alerta.mensaje }}
+                        </li>
+                    </ul>
                 </div>
 
                 <!-- Stat tiles -->
